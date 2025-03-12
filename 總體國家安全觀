@@ -144,7 +144,7 @@
     let timer;
 
     // Symbols for the game
-    const symbols = ['科技安全', '文化安全', '資源安全', '生物安全', '太空安全', '社會安全', '國土安全', '政治安全'];
+    const symbols = [' 科技安全 ', ' 文化安全 ', ' 資源安全 ', ' 生物安全 ', ' 太空安全 ', ' 社會安全 ', ' 國土安全 ', ' 政治安全 '];
 
     // Start form submission handler
     startForm.addEventListener('submit', (e) => {
