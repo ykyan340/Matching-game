@@ -1,0 +1,251 @@
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>總體國家安全觀</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f0f4f8;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    label {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background: #4caf50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transform: scale(1);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+    }
+
+    .card.flipped,
+    .card.matched {
+      background: #ffc107;
+      cursor: default;
+      transform: scale(1);
+      color: #333;
+    }
+
+    .card.matched {
+      background: #4caf50;
+      color: white;
+    }
+
+    .timer {
+      margin-top: 10px;
+      font-size: 20px;
+      color: #ff0000;
+    }
+
+    .message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <h1>總體國家安全觀</h1>
+
+  <!-- Form to capture class and class number -->
+  <form id="startForm">
+    <label for="class">班級:</label>
+    <input type="text" id="class" name="class" required placeholder="請輸入您的班級">
+    
+    <label for="classNumber">學號:</label>
+    <input type="number" id="classNumber" name="classNumber" required placeholder="請輸入您的學號">
+    
+    <button type="submit">開始遊戲</button>
+  </form>
+
+  <!-- Game elements -->
+  <div class="timer hidden" id="timer">時間: 3:00</div>
+  <div class="game-container hidden" id="game"></div>
+  <div class="message hidden" id="message"></div>
+
+  <script>
+    const startForm = document.getElementById('startForm');
+    const timerDisplay = document.getElementById('timer');
+    const gameContainer = document.getElementById('game');
+    const messageDisplay = document.getElementById('message');
+    let firstCard = null;
+    let secondCard = null;
+    let matches = 0;
+    let timeLeft = 180; // 3 minutes in seconds
+    let timer;
+
+    // Symbols for the game
+    const symbols = ['科技安全', '文化安全', '資源安全', '生物安全', '太空安全', '社會安全', '國土安全', '政治安全'];
+
+    // Start form submission handler
+    startForm.addEventListener('submit', (e) => {
+      e.preventDefault(); // Prevent form submission
+      const classValue = document.getElementById('class').value;
+      const classNumber = document.getElementById('classNumber').value;
+
+      if (classValue && classNumber) {
+        startForm.classList.add('hidden'); // Hide the form
+        timerDisplay.classList.remove('hidden'); // Show the timer
+        gameContainer.classList.remove('hidden'); // Show the game
+        messageDisplay.classList.remove('hidden'); // Show message area
+        startGame(); // Start the game
+      }
+    });
+
+    // Shuffle and create game cards
+    const cards = [...symbols, ...symbols]
+      .sort(() => Math.random() - 0.5)
+      .map((symbol) => createCardElement(symbol));
+
+    // Add cards to the game container
+    cards.forEach((card) => gameContainer.appendChild(card));
+
+    // Create a card element
+    function createCardElement(symbol) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.dataset.symbol = symbol;
+      card.innerHTML = `<span class="hidden">${symbol}</span>`;
+      card.addEventListener('click', handleCardClick);
+      return card;
+    }
+
+    // Handle card click
+    function handleCardClick(event) {
+      const clickedCard = event.currentTarget;
+
+      if (
+        clickedCard.classList.contains('flipped') ||
+        clickedCard.classList.contains('matched')
+      ) {
+        return;
+      }
+
+      clickedCard.classList.add('flipped');
+      clickedCard.querySelector('span').classList.remove('hidden');
+
+      if (!firstCard) {
+        firstCard = clickedCard;
+      } else if (!secondCard) {
+        secondCard = clickedCard;
+
+        if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+          firstCard.classList.add('matched');
+          secondCard.classList.add('matched');
+          matches += 1;
+
+          firstCard = null;
+          secondCard = null;
+
+          if (matches === symbols.length) {
+            clearInterval(timer);
+            messageDisplay.textContent = '恭喜！你贏了！🎉';
+          }
+        } else {
+          setTimeout(() => {
+            firstCard.classList.remove('flipped');
+            secondCard.classList.remove('flipped');
+            firstCard.querySelector('span').classList.add('hidden');
+            secondCard.querySelector('span').classList.add('hidden');
+            firstCard = null;
+            secondCard = null;
+          }, 1000);
+        }
+      }
+    }
+
+    // Start the game timer
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft -= 1;
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `時間: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          messageDisplay.textContent = '時間到！你輸了！😢';
+          document.querySelectorAll('.card').forEach((card) => {
+            card.removeEventListener('click', handleCardClick);
+          });
+        }
+      }, 1000);
+    }
+
+    // Start the game
+    function startGame() {
+      startTimer();
+    }
+  </script>
+</body>
+</html>
