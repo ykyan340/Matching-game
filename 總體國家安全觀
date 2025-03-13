@@ -1,1 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>總體國家安全觀 Matching Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .info-form {
+            margin-bottom: 20px;
+        }
+        .info-form input {
+            margin: 5px;
+            padding: 8px;
+            width: calc(50% - 12px);
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .start-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .start-btn:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        .game-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            width: 100px;
+            height: 120px;
+            margin: 10px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .card.matched {
+            background-color: #28a745;
+            cursor: default;
+        }
+        .card.hidden {
+            background-color: #ccc;
+            color: transparent;
+            cursor: pointer;
+        }
+        .timer {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>總體國家安全觀 Matching Game</h1>
+        <div class="info-form">
+            <input type="text" id="class" placeholder="Enter your class">
+            <input type="text" id="class-number" placeholder="Enter your class number">
+            <button class="start-btn" id="start-btn" disabled>Start Game</button>
+        </div>
+        <div class="game-container" id="game-container">
+            <div class="timer" id="timer">Time left: 90s</div>
+            <div class="cards" id="cards"></div>
+        </div>
+    </div>
 
+    <script>
+        // Variables
+        const startButton = document.getElementById('start-btn');
+        const classInput = document.getElementById('class');
+        const classNumberInput = document.getElementById('class-number');
+        const gameContainer = document.getElementById('game-container');
+        const cardsContainer = document.getElementById('cards');
+        const timerElement = document.getElementById('timer');
+        let timer;
+        let timeLeft = 90;
+        let firstCard = null;
+        let secondCard = null;
+        let matchedPairs = 0;
+
+        // Card data (pairs to match)
+        const cardData = [
+            { id: 1, text: "國防安全" },
+            { id: 2, text: "經濟安全" },
+            { id: 3, text: "科技安全" },
+            { id: 4, text: "文化安全" },
+            { id: 5, text: "網絡安全" },
+            { id: 6, text: "生態安全" },
+            { id: 1, text: "國防安全" },
+            { id: 2, text: "經濟安全" },
+            { id: 3, text: "科技安全" },
+            { id: 4, text: "文化安全" },
+            { id: 5, text: "網絡安全" },
+            { id: 6, text: "生態安全" }
+        ];
+
+        // Shuffle cards
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Enable start button only if both fields are filled
+        function validateInputs() {
+            startButton.disabled = !(classInput.value && classNumberInput.value);
+        }
+
+        // Start game
+        function startGame() {
+            gameContainer.style.display = 'block';
+            startButton.disabled = true;
+            classInput.disabled = true;
+            classNumberInput.disabled = true;
+            startTimer();
+            initializeCards();
+        }
+
+        // Initialize cards
+        function initializeCards() {
+            cardsContainer.innerHTML = '';
+            const shuffledCards = shuffle(cardData);
+            shuffledCards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card', 'hidden');
+                cardElement.dataset.id = card.id;
+                cardElement.textContent = card.text;
+                cardElement.addEventListener('click', handleCardClick);
+                cardsContainer.appendChild(cardElement);
+            });
+        }
+
+        // Handle card click
+        function handleCardClick(event) {
+            const clickedCard = event.target;
+
+            if (clickedCard.classList.contains('matched') || clickedCard === firstCard) return;
+
+            clickedCard.classList.remove('hidden');
+
+            if (!firstCard) {
+                firstCard = clickedCard;
+            } else {
+                secondCard = clickedCard;
+                checkMatch();
+            }
+        }
+
+        // Check if two cards match
+        function checkMatch() {
+            if (firstCard.dataset.id === secondCard.dataset.id) {
+                firstCard.classList.add('matched');
+                secondCard.classList.add('matched');
+                matchedPairs += 1;
+                if (matchedPairs === cardData.length / 2) {
+                    clearInterval(timer);
+                    alert('Congratulations! You matched all pairs.');
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.classList.add('hidden');
+                    secondCard.classList.add('hidden');
+                }, 1000);
+            }
+            firstCard = null;
+            secondCard = null;
+        }
+
+        // Start timer
+        function startTimer() {
+            timerElement.textContent = `Time left: ${timeLeft}s`;
+            timer = setInterval(() => {
+                timeLeft -= 1;
+                timerElement.textContent = `Time left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert('Time up! Game over.');
+                    resetGame();
+                }
+            }, 1000);
+        }
+
+        // Reset game
+        function resetGame() {
+            gameContainer.style.display = 'none';
+            startButton.disabled = false;
+            classInput.disabled = false;
+            classNumberInput.disabled = false;
+            timeLeft = 90;
+            matchedPairs = 0;
+            firstCard = null;
+            secondCard = null;
+        }
+
+        // Event listeners
+        classInput.addEventListener('input', validateInputs);
+        classNumberInput.addEventListener('input', validateInputs);
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
