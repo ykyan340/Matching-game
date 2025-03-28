@@ -121,7 +121,7 @@
         </div>
         
         <div class="game-area" id="gameArea">
-            <div class="timer" id="timer">剩餘時間: 60秒</div>
+            <div class="timer" id="timer">剩餘時間: 90秒</div>
             <div class="matching-pairs" id="matchingPairs"></div>
             <button class="btn" id="restartBtn">重新開始</button>
             <div class="result" id="result"></div>
@@ -140,7 +140,7 @@
             { question: "國家安全體系中的首要", answer: "政治安全" },
             { question: "國家安全教育日", answer: "4月15日" },
             { question: "國家安全工作根本原則", answer: "堅持黨對國家安全工作的絕對領導" },
-            { question: "國家安全的重要領域", answer: "網絡安全" },
+            { question: "國家安全的重要領域", answer: "網路安全" },
             { question: "國家安全的重要內容", answer: "生態安全" },
             { question: "新時代國家安全體系包含的領域數量", answer: "16個" },
             { question: "國家安全的重要基礎", answer: "社會穩定" },
@@ -149,7 +149,7 @@
         ];
 
         // 遊戲變量
-        let timeLeft = 90;
+        let timeLeft = 90;  // 修改為90秒
         let timer;
         let selectedCards = [];
         let matchedPairs = 0;
@@ -189,7 +189,7 @@
 
         function initializeGame() {
             // 重置遊戲變量
-            timeLeft = 90;
+            timeLeft = 90;  // 修改為90秒
             selectedCards = [];
             matchedPairs = 0;
             
@@ -266,7 +266,7 @@
                     // 檢查是否所有卡片都已匹配
                     if (matchedPairs === totalPairs) {
                         clearInterval(timer);
-                        resultDiv.textContent = `恭喜 ${className} ${classNumber} 同學！你成功在 ${60 - timeLeft} 秒內完成所有配對！`;
+                        resultDiv.textContent = `恭喜 ${className} ${classNumber} 同學！你成功在 ${90 - timeLeft} 秒內完成所有配對！`;
                         resultDiv.style.display = 'block';
                     }
                 } else {
@@ -309,4 +309,3 @@
     </script>
 </body>
 </html>
-
