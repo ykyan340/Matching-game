@@ -1,204 +1,312 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>總體國家安全觀 Matching Game</title>
+    <title>總體國家安全觀配對遊戲</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f0f4f8;
-        }
-        h1 {
-            font-size: 2rem;
+            padding: 20px;
             color: #333;
         }
-        .form-container, .game-container {
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            margin: 20px auto;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
             padding: 20px;
             border-radius: 10px;
-            background: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .form-container input, .form-container button {
-            margin: 10px 0;
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ccc;
+        h1 {
+            color: #c00;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .registration {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
             border-radius: 5px;
         }
-        .game-container {
+        .game-area {
             display: none;
         }
-        .question {
-            font-size: 1.2rem;
-            margin: 20px 0;
+        .timer {
+            font-size: 24px;
+            text-align: center;
+            margin: 10px 0;
+            color: #c00;
+            font-weight: bold;
         }
-        .answers {
-            display: flex;
-            flex-wrap: wrap;
+        .matching-pairs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+        }
+        .card {
+            background-color: #e6e6e6;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 80px;
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
-        .answers button {
-            padding: 10px 15px;
-            background: #007bff;
-            color: #fff;
+        .card:hover {
+            background-color: #d9d9d9;
+        }
+        .card.selected {
+            background-color: #ffeb99;
+        }
+        .card.matched {
+            background-color: #b7e1cd;
+            cursor: default;
+        }
+        .btn {
+            background-color: #c00;
+            color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
         }
-        .answers button:hover {
-            background: #0056b3;
-        }
-        .timer {
-            font-weight: bold;
-            margin: 10px 0;
-            font-size: 1.2rem;
+        .btn:hover {
+            background-color: #a00;
         }
         .result {
-            font-size: 1.5rem;
-            margin: 20px 0;
-            color: #007bff;
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-
-    <h1>總體國家安全觀 Matching Game</h1>
-    <div class="form-container">
-        <input type="text" id="classInput" placeholder="請輸入班級 (例如：1班)" required>
-        <input type="text" id="classNumberInput" placeholder="請輸入學號" required>
-        <button id="startButton">開始遊戲</button>
-    </div>
-
-    <div class="game-container">
-        <div class="timer">剩餘時間：<span id="timeLeft">90</span> 秒</div>
-        <div class="question" id="question"></div>
-        <div class="answers" id="answers"></div>
-        <div class="result" id="result"></div>
+    <div class="container">
+        <h1>總體國家安全觀配對遊戲</h1>
+        
+        <div class="registration" id="registration">
+            <h2>學生資料</h2>
+            <label for="className">班級:</label>
+            <input type="text" id="className" placeholder="請輸入你的班級" required>
+            
+            <label for="classNumber">學號:</label>
+            <input type="text" id="classNumber" placeholder="請輸入你的學號" required>
+            
+            <button class="btn" id="startBtn">開始遊戲</button>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="timer" id="timer">剩餘時間: 60秒</div>
+            <div class="matching-pairs" id="matchingPairs"></div>
+            <button class="btn" id="restartBtn">重新開始</button>
+            <div class="result" id="result"></div>
+        </div>
     </div>
 
     <script>
-        const questions = [
-            { 
-                question: "總體國家安全觀的核心理念是什麼？", 
-                answers: ["整體安全", "經濟增長", "文化傳承"], 
-                correct: "整體安全" 
-            },
-            { 
-                question: "以下哪一項不屬於總體國家安全觀的範疇？", 
-                answers: ["網絡安全", "體育安全", "經濟安全"], 
-                correct: "體育安全" 
-            },
-            { 
-                question: "總體國家安全觀如何平衡發展和安全？", 
-                answers: ["安全優先，再求發展", "發展與安全並重", "只注重發展"], 
-                correct: "發展與安全並重" 
-            },
-            { 
-                question: "哪一項符合總體國家安全觀的精神？", 
-                answers: ["可持續發展", "單一軍事安全", "忽視網絡安全"], 
-                correct: "可持續發展" 
-            },
-            { 
-                question: "總體國家安全觀的重點是什麼？", 
-                answers: ["只有經濟增長", "綜合安全", "僅保護文化資產"], 
-                correct: "綜合安全" 
-            }
+        // 遊戲數據 - 問題和答案
+        const gameData = [
+            { question: "總體國家安全觀的提出年份", answer: "2014年" },
+            { question: "總體國家安全觀的核心", answer: "以人民安全為宗旨" },
+            { question: "總體國家安全觀的根本", answer: "政治安全" },
+            { question: "總體國家安全觀的基礎", answer: "經濟安全" },
+            { question: "總體國家安全觀的保障", answer: "軍事、文化、社會安全" },
+            { question: "總體國家安全觀的依托", answer: "促進國際安全" },
+            { question: "國家安全體系中的首要", answer: "政治安全" },
+            { question: "國家安全教育日", answer: "4月15日" },
+            { question: "國家安全工作根本原則", answer: "堅持黨對國家安全工作的絕對領導" },
+            { question: "國家安全的重要領域", answer: "網絡安全" },
+            { question: "國家安全的重要內容", answer: "生態安全" },
+            { question: "新時代國家安全體系包含的領域數量", answer: "16個" },
+            { question: "國家安全的重要基礎", answer: "社會穩定" },
+            { question: "維護國家安全的根本目的", answer: "保障人民利益" },
+            { question: "國家安全的重要保障", answer: "國防和軍隊現代化" }
         ];
 
-        let timeLeft = 90;
-        let score = 0;
-        let currentQuestionIndex = 0;
+        // 遊戲變量
+        let timeLeft = 60;
+        let timer;
+        let selectedCards = [];
+        let matchedPairs = 0;
+        let totalPairs;
+        let className = "";
+        let classNumber = "";
+        let shuffledQuestions = [];
+        let shuffledAnswers = [];
 
-        const formContainer = document.querySelector(".form-container");
-        const gameContainer = document.querySelector(".game-container");
-        const startButton = document.querySelector("#startButton");
-        const classInput = document.querySelector("#classInput");
-        const classNumberInput = document.querySelector("#classNumberInput");
-        const questionElement = document.querySelector("#question");
-        const answersElement = document.querySelector("#answers");
-        const timerElement = document.querySelector("#timeLeft");
-        const resultElement = document.querySelector("#result");
+        // DOM元素
+        const registrationDiv = document.getElementById('registration');
+        const gameAreaDiv = document.getElementById('gameArea');
+        const timerDiv = document.getElementById('timer');
+        const matchingPairsDiv = document.getElementById('matchingPairs');
+        const resultDiv = document.getElementById('result');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 開始遊戲
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', restartGame);
 
         function startGame() {
-            const userClass = classInput.value.trim();
-            const userClassNumber = classNumberInput.value.trim();
-
-            if (!userClass || !userClassNumber) {
-                alert("請填寫班級和學號！");
+            className = document.getElementById('className').value;
+            classNumber = document.getElementById('classNumber').value;
+            
+            if (!className || !classNumber) {
+                alert("請輸入班級和學號！");
                 return;
             }
-
-            formContainer.style.display = "none";
-            gameContainer.style.display = "block";
-            score = 0;
-            currentQuestionIndex = 0;
-            timeLeft = 90;
-
-            loadQuestion();
-            startTimer();
+            
+            registrationDiv.style.display = 'none';
+            gameAreaDiv.style.display = 'block';
+            
+            initializeGame();
         }
 
-        function startTimer() {
-            const timer = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
+        function initializeGame() {
+            // 重置遊戲變量
+            timeLeft = 60;
+            selectedCards = [];
+            matchedPairs = 0;
+            
+            // 隨機排序問題和答案
+            const shuffledData = [...gameData].sort(() => Math.random() - 0.5);
+            shuffledQuestions = shuffledData.map(item => item.question);
+            shuffledAnswers = shuffledData.map(item => item.answer);
+            
+            // 只使用8對問題進行遊戲
+            totalPairs = Math.min(8, gameData.length);
+            shuffledQuestions = shuffledQuestions.slice(0, totalPairs);
+            shuffledAnswers = shuffledAnswers.slice(0, totalPairs);
+            
+            // 組合並洗牌卡片
+            const allCards = [];
+            for (let i = 0; i < totalPairs; i++) {
+                allCards.push({ text: shuffledQuestions[i], type: 'question', index: i });
+                allCards.push({ text: shuffledAnswers[i], type: 'answer', index: i });
+            }
+            
+            // 洗牌
+            const shuffledCards = allCards.sort(() => Math.random() - 0.5);
+            
+            // 顯示卡片
+            matchingPairsDiv.innerHTML = '';
+            shuffledCards.forEach((card, idx) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.textContent = '點擊查看';
+                cardElement.dataset.index = idx;
+                cardElement.dataset.cardIndex = card.index;
+                cardElement.dataset.type = card.type;
+                cardElement.dataset.text = card.text;
+                cardElement.addEventListener('click', flipCard);
+                matchingPairsDiv.appendChild(cardElement);
+            });
+            
+            // 開始計時
+            clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
 
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    endGame();
+        function flipCard() {
+            // 如果卡片已選中或已匹配，不允許再次點擊
+            if (this.classList.contains('selected') || this.classList.contains('matched')) {
+                return;
+            }
+            
+            // 不允許同時選中超過2張卡片
+            if (selectedCards.length >= 2) {
+                return;
+            }
+            
+            // 翻轉卡片
+            this.textContent = this.dataset.text;
+            this.classList.add('selected');
+            selectedCards.push(this);
+            
+            // 如果選中了兩張卡片，檢查是否匹配
+            if (selectedCards.length === 2) {
+                const card1 = selectedCards[0];
+                const card2 = selectedCards[1];
+                
+                // 檢查是否匹配（一張問題卡和一張答案卡，且索引相同）
+                if (card1.dataset.type !== card2.dataset.type && 
+                    card1.dataset.cardIndex === card2.dataset.cardIndex) {
+                    // 匹配成功
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    selectedCards = [];
+                    matchedPairs++;
+                    
+                    // 檢查是否所有卡片都已匹配
+                    if (matchedPairs === totalPairs) {
+                        clearInterval(timer);
+                        resultDiv.textContent = `恭喜 ${className} ${classNumber} 同學！你成功在 ${60 - timeLeft} 秒內完成所有配對！`;
+                        resultDiv.style.display = 'block';
+                    }
+                } else {
+                    // 不匹配，延遲後翻回去
+                    setTimeout(() => {
+                        card1.textContent = '點擊查看';
+                        card2.textContent = '點擊查看';
+                        card1.classList.remove('selected');
+                        card2.classList.remove('selected');
+                        selectedCards = [];
+                    }, 1000);
                 }
-            }, 1000);
+            }
         }
 
-        function loadQuestion() {
-            if (currentQuestionIndex >= questions.length) {
-                endGame();
-                return;
-            }
-
-            const currentQuestion = questions[currentQuestionIndex];
-            questionElement.textContent = currentQuestion.question;
-            answersElement.innerHTML = "";
-
-            currentQuestion.answers
-                .sort(() => Math.random() - 0.5) // Randomize answers
-                .forEach(answer => {
-                    const button = document.createElement("button");
-                    button.textContent = answer;
-                    button.onclick = () => checkAnswer(answer);
-                    answersElement.appendChild(button);
+        function updateTimer() {
+            timeLeft--;
+            timerDiv.textContent = `剩餘時間: ${timeLeft}秒`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                resultDiv.textContent = `時間到！${className} ${classNumber} 同學，你完成了 ${matchedPairs}/${totalPairs} 個配對。`;
+                resultDiv.style.display = 'block';
+                
+                // 禁用所有卡片
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.style.pointerEvents = 'none';
+                    if (!card.classList.contains('matched')) {
+                        card.textContent = card.dataset.text;
+                    }
                 });
-        }
-
-        function checkAnswer(selectedAnswer) {
-            const currentQuestion = questions[currentQuestionIndex];
-            if (selectedAnswer === currentQuestion.correct) {
-                score++;
             }
-            currentQuestionIndex++;
-            loadQuestion();
         }
 
-        function endGame() {
-            gameContainer.innerHTML = `<div class="result">遊戲結束！您的成績是：${score}/${questions.length}</div>`;
+        function restartGame() {
+            resultDiv.style.display = 'none';
+            initializeGame();
         }
-
-        startButton.addEventListener("click", startGame);
     </script>
-
 </body>
 </html>
+
