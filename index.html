@@ -88,7 +88,7 @@
     </div>
     
     <div id="gameContainer" style="display: none;">
-        <div id="timer">剩余时间: 90秒</div>
+        <div id="timer">剩余时间: 60秒</div>
         <div id="questions"></div>
         <button id="submitGame">提交答案</button>
     </div>
@@ -168,7 +168,7 @@
         function startGame() {
             score = 0;
             currentQuestion = 0;
-            timeLeft = 90;
+            timeLeft = 60;
             timerDisplay.textContent = `剩余时间: ${timeLeft}秒`;
             
             // Start timer
