@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>总体国家安全观配对游戏</title>
+    <title>總體國家安全觀配對遊戲</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
@@ -31,6 +31,7 @@
             text-align: center;
             padding: 5px;
             box-sizing: border-box;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
         }
         .card.flipped {
             background-color: #f1f1f1;
@@ -44,6 +45,7 @@
             font-size: 24px;
             font-weight: bold;
             margin: 20px 0;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
         }
         button {
             background-color: #4CAF50;
@@ -57,6 +59,7 @@
             margin: 10px 2px;
             cursor: pointer;
             border-radius: 5px;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
         }
         .question {
             margin-bottom: 30px;
@@ -64,37 +67,38 @@
         .question-title {
             font-weight: bold;
             margin-bottom: 10px;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
         }
     </style>
 </head>
 <body>
-    <h1>总体国家安全观配对游戏</h1>
+    <h1>總體國家安全觀配對遊戲</h1>
     
     <div id="loginForm">
-        <h2>请输入您的信息</h2>
+        <h2>請輸入您的信息</h2>
         <div>
-            <label for="className">班级:</label>
+            <label for="className">班級:</label>
             <input type="text" id="className" required>
         </div>
         <div>
-            <label for="classNumber">班号:</label>
+            <label for="classNumber">班號:</label>
             <input type="text" id="classNumber" required>
         </div>
         <div>
             <label for="studentName">姓名:</label>
             <input type="text" id="studentName" required>
         </div>
-        <button id="startGame">开始游戏</button>
+        <button id="startGame">開始遊戲</button>
     </div>
     
     <div id="gameContainer" style="display: none;">
-        <div id="timer">剩余时间: 60秒</div>
+        <div id="timer">剩餘時間: 60秒</div>
         <div id="questions"></div>
         <button id="submitGame">提交答案</button>
     </div>
     
     <div id="results" style="display: none;">
-        <h2>游戏结果</h2>
+        <h2>遊戲結果</h2>
         <p id="resultText"></p>
         <button id="playAgain">再玩一次</button>
     </div>
@@ -103,21 +107,21 @@
         // Game data
         const questions = [
             {
-                title: "问题1: 匹配国家安全领域与其描述",
+                title: "問題1: 匹配國家安全領域與其描述",
                 pairs: [
-                    ["政治安全", "国家政权、主权、统一和领土完整"],
-                    ["经济安全", "国家经济稳定和可持续发展"],
-                    ["军事安全", "国家免受外部军事威胁"],
-                    ["文化安全", "国家文化传承和价值观安全"]
+                    ["政治安全", "國家政權、主權、統一和領土完整"],
+                    ["經濟安全", "國家經濟穩定和可持續發展"],
+                    ["軍事安全", "國家免受外部軍事威脅"],
+                    ["文化安全", "國家文化傳承和價值觀安全"]
                 ]
             },
             {
-                title: "问题2: 匹配安全概念与其相关领域",
+                title: "問題2: 匹配安全概念與其相關領域",
                 pairs: [
-                    ["网络安全", "网络空间主权"],
-                    ["生态安全", "生态文明建设"],
-                    ["资源安全", "能源和战略资源保障"],
-                    ["科技安全", "核心技术创新"]
+                    ["網絡安全", "網絡空間主權"],
+                    ["生態安全", "生態文明建設"],
+                    ["資源安全", "能源和戰略資源保障"],
+                    ["科技安全", "核心技術創新"]
                 ]
             }
         ];
@@ -125,7 +129,7 @@
         // Game variables
         let currentQuestion = 0;
         let score = 0;
-        let timeLeft = 90;
+        let timeLeft = 60; // Changed to 60 seconds
         let timer;
         let userInfo = {};
         let selectedCards = [];
@@ -160,7 +164,7 @@
                 gameContainer.style.display = 'block';
                 startGame();
             } else {
-                alert('请填写所有信息！');
+                alert('請填寫所有信息！');
             }
         });
 
@@ -168,13 +172,13 @@
         function startGame() {
             score = 0;
             currentQuestion = 0;
-            timeLeft = 60;
-            timerDisplay.textContent = `剩余时间: ${timeLeft}秒`;
+            timeLeft = 60; // Reset to 60 seconds
+            timerDisplay.textContent = `剩餘時間: ${timeLeft}秒`;
             
             // Start timer
             timer = setInterval(function() {
                 timeLeft--;
-                timerDisplay.textContent = `剩余时间: ${timeLeft}秒`;
+                timerDisplay.textContent = `剩餘時間: ${timeLeft}秒`;
                 
                 if (timeLeft <= 0) {
                     endGame();
@@ -222,7 +226,7 @@
                 card.dataset.text = item.text;
                 card.dataset.pair = item.pair;
                 card.dataset.isTerm = item.isTerm;
-                card.textContent = '点击查看';
+                card.textContent = '點擊查看';
                 
                 card.addEventListener('click', function() {
                     flipCard(this);
@@ -269,8 +273,8 @@
             } else {
                 // No match
                 setTimeout(() => {
-                    card1.textContent = '点击查看';
-                    card2.textContent = '点击查看';
+                    card1.textContent = '點擊查看';
+                    card2.textContent = '點擊查看';
                     card1.classList.remove('flipped');
                     card2.classList.remove('flipped');
                 }, 1000);
@@ -290,11 +294,11 @@
             
             const percentage = Math.round((score / questions.length) * 100);
             resultText.innerHTML = `
-                <p>学生: ${userInfo.studentName}</p>
-                <p>班级: ${userInfo.className} ${userInfo.classNumber}</p>
+                <p>學生: ${userInfo.studentName}</p>
+                <p>班級: ${userInfo.className} ${userInfo.classNumber}</p>
                 <p>得分: ${score} / ${questions.length}</p>
-                <p>正确率: ${percentage}%</p>
-                <p>剩余时间: ${timeLeft}秒</p>
+                <p>正確率: ${percentage}%</p>
+                <p>剩餘時間: ${timeLeft}秒</p>
             `;
         }
 
